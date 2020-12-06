@@ -40,6 +40,150 @@ export default function MainPage(props) {
     writeUserData();
   };
 
+  const missileRangePredictionAlgorithm = (missile, missileType) => {
+    // first calculate terminal velocity depending on missile type
+    // missile 0 - scarab / missile 1 - scud
+    // missileType - A B C / A B C D
+    var velocity_terminal;
+    var missile_mass;
+    var gravitational_acceleration = 9.8;
+    var drag_coefficient = 0.04;
+    var air_density = 1.225;
+    var cross_area_section;
+    var missile_max_velocity;
+    var time;
+    var missile_range_predicted = 0;
+    var missile_accuracy_radius;
+
+    // scarab
+    if (missile === 0 && missileType === "A") {
+      missile_mass = 2000;
+      cross_area_section = Math.PI * Math.pow(0.65, 2);
+      missile_max_velocity = 1800; // m/s
+
+      // calculate terminal velocity for scarab type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scarab type
+      time = 70000 / missile_max_velocity;
+      missile_accuracy_radius = 150;
+    }
+
+    if (missile === 0 && missileType === "B") {
+      missile_mass = 2010;
+      cross_area_section = Math.PI * Math.pow(0.65, 2);
+      missile_max_velocity = 1800; // m/s
+
+      // calculate terminal velocity for scarab type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scarab type
+      time = 120000 / missile_max_velocity;
+      missile_accuracy_radius = 150;
+    }
+
+    if (missile === 0 && missileType === "C") {
+      missile_mass = 1800;
+      cross_area_section = Math.PI * Math.pow(0.65, 2);
+      missile_max_velocity = 1800; // m/s
+
+      // calculate terminal velocity for scarab type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scarab type
+      time = 185000 / missile_max_velocity;
+      missile_accuracy_radius = 150;
+    }
+
+    // scud
+    if (missile === 1 && missileType === "A") {
+      missile_mass = 4400;
+      cross_area_section = Math.PI * Math.pow(0.88, 2);
+      missile_max_velocity = 1700; // m/s
+
+      // calculate terminal velocity for scud type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scud type
+      time = 180000 / missile_max_velocity;
+      missile_accuracy_radius = 3000;
+    }
+
+    if (missile === 1 && missileType === "B") {
+      missile_mass = 5900;
+      cross_area_section = Math.PI * Math.pow(0.88, 2);
+      missile_max_velocity = 1700; // m/s
+
+      // calculate terminal velocity for scud type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scud type
+      time = 300000 / missile_max_velocity;
+      missile_accuracy_radius = 450;
+    }
+
+    if (missile === 1 && missileType === "C") {
+      missile_mass = 6400;
+      cross_area_section = Math.PI * Math.pow(0.88, 2);
+      missile_max_velocity = 1700; // m/s
+
+      // calculate terminal velocity for scud type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scud type
+      time = 600000 / missile_max_velocity;
+      missile_accuracy_radius = 700;
+    }
+
+    if (missile === 1 && missileType === "D") {
+      missile_mass = 6500;
+      cross_area_section = Math.PI * Math.pow(0.88, 2);
+      missile_max_velocity = 1700; // m/s
+
+      // calculate terminal velocity for scud type
+      velocity_terminal = Math.sqrt(
+        (2 * missile_mass * gravitational_acceleration) /
+          (drag_coefficient * air_density * cross_area_section)
+      );
+
+      // time to hit the ground for scud type
+      time = 700000 / missile_max_velocity;
+      missile_accuracy_radius = 50;
+    }
+
+    // range to hit prediction
+    missile_range_predicted =
+      (Math.pow(velocity_terminal, 2) / gravitational_acceleration) *
+      Math.log(
+        (Math.pow(velocity_terminal, 2) +
+          gravitational_acceleration * missile_max_velocity * time) /
+          Math.pow(velocity_terminal, 2)
+      );
+
+    var totalRange = missile_range_predicted / 1000;
+    console.log(totalRange.toPrecision(3) + "km");
+
+    return missile_range_predicted;
+  };
+
   return (
     <div style={{ width: "100%" }}>
       <div>
@@ -99,6 +243,13 @@ export default function MainPage(props) {
               variant="outlined"
             >
               Scarab C
+            </Button>
+            <Button
+              onClick={() => missileRangePredictionAlgorithm(0, "A")}
+              className={classes.button}
+              variant="outlined"
+            >
+              Test
             </Button>
           </Grid>
         </Grid>
