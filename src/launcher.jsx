@@ -27,20 +27,42 @@ export default function MainPage(props) {
   // Get a reference to the database service
   var database = firebase.database();
 
-  function writeUserData() {
+  function writeUserData(latt, longg, radius) {
     database.ref("incomingMissiles").push({
-      lat: 24.2323,
-      lng: 32.32323,
-      radius: 40,
+      lat: latt,
+      lng: longg,
+      radius: radius,
     });
   }
 
-  const calculateImpactCoordinates = (param) => {
-    console.log("hey");
-    writeUserData();
+  const lattometers = (my_lat, my_long, meters) => {
+    // number of km per degree = ~111km (111.32 in google maps, but range varies
+    // between 110.567km at the equator and 111.699km at the poles)
+    // 1km in degree = 1 / 111.32km = 0.0089
+    // 1m in degree = 0.0089 / 1000 = 0.0000089
+    let coef = meters * 0.0000089;
+
+    let new_lat = my_lat + coef;
+
+    // pi / 180 = 0.018
+    let new_long = my_long + coef / Math.cos(my_lat * 0.018);
+
+    return [new_lat, new_long];
   };
 
   const missileRangePredictionAlgorithm = (missile, missileType) => {
+    var first_missile_detected = [40.06058315442592, 49.30300450531811];
+    var second_missile_detected = [40.000375821502296, 49.45882631330645];
+    var third_missile_detected = [39.94606117633334, 49.26976314246156];
+    var fourth_missile_detected = [39.93336410956136, 49.43040078441825];
+
+    var latlangs = [
+      first_missile_detected,
+      second_missile_detected,
+      third_missile_detected,
+      fourth_missile_detected,
+    ];
+
     // first calculate terminal velocity depending on missile type
     // missile 0 - scarab / missile 1 - scud
     // missileType - A B C / A B C D
@@ -178,10 +200,15 @@ export default function MainPage(props) {
           Math.pow(velocity_terminal, 2)
       );
 
-    var totalRange = missile_range_predicted / 1000;
-    console.log(totalRange.toPrecision(3) + "km");
+    const random_location =
+      latlangs[Math.floor(Math.random() * latlangs.length)];
+    const scott_lang = lattometers(
+      random_location[0],
+      random_location[1],
+      missile_range_predicted
+    );
 
-    return missile_range_predicted;
+    writeUserData(scott_lang[0], scott_lang[1], missile_accuracy_radius);
   };
 
   return (
@@ -224,32 +251,25 @@ export default function MainPage(props) {
               SCARAB / OTR-21 TOCHKA
             </Typography>
             <Button
-              onClick={() => calculateImpactCoordinates("first")}
+              onClick={() => missileRangePredictionAlgorithm(0, "A")}
               className={classes.button}
               variant="outlined"
             >
               Scarab A
             </Button>
             <Button
-              onClick={() => calculateImpactCoordinates("second")}
+              onClick={() => missileRangePredictionAlgorithm(0, "B")}
               className={classes.button}
               variant="outlined"
             >
               Scarab B
             </Button>
             <Button
-              onClick={() => calculateImpactCoordinates("third")}
+              onClick={() => missileRangePredictionAlgorithm(0, "C")}
               className={classes.button}
               variant="outlined"
             >
               Scarab C
-            </Button>
-            <Button
-              onClick={() => missileRangePredictionAlgorithm(0, "A")}
-              className={classes.button}
-              variant="outlined"
-            >
-              Test
             </Button>
           </Grid>
         </Grid>
@@ -266,28 +286,28 @@ export default function MainPage(props) {
               SCUD / R11 / R300
             </Typography>
             <Button
-              onClick={() => calculateImpactCoordinates("first")}
+              onClick={() => missileRangePredictionAlgorithm(1, "A")}
               className={classes.button}
               variant="outlined"
             >
               Scud A
             </Button>
             <Button
-              onClick={() => calculateImpactCoordinates("second")}
+              onClick={() => missileRangePredictionAlgorithm(1, "B")}
               className={classes.button}
               variant="outlined"
             >
               Scud B
             </Button>
             <Button
-              onClick={() => calculateImpactCoordinates("third")}
+              onClick={() => missileRangePredictionAlgorithm(1, "C")}
               className={classes.button}
               variant="outlined"
             >
               Scud C
             </Button>
             <Button
-              onClick={() => calculateImpactCoordinates("fourth")}
+              onClick={() => missileRangePredictionAlgorithm(1, "D")}
               className={classes.button}
               variant="outlined"
             >
